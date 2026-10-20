@@ -2,33 +2,23 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Лабораторная №3 — Вариант 6</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Поворот изображения</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Поворот изображений</h1>
-    <form method="post" enctype="multipart/form-data">
-        <fieldset>
-            <legend>Настройки изображения</legend>
-            <p>Изображение: <input type="file" name="image" accept=".jpg,.jpeg,.png" required></p>
-            <p>Угол поворота: <input type="number" name="angle" value="90" min="-360" max="360" step="any" required></p>
-            <p>Сколько будет {{ captcha }}? <input type="number" name="captcha" required></p>
-            <button>Повернуть</button>
-        </fieldset>
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" required>
+        <input type="number" name="angle" value="90" required>
+        <p>{{ captcha }} = ?</p>
+        <input type="number" name="captcha" required>
+        <button>Повернуть</button>
     </form>
-    {% if error %}<p class="error">{{ error }}</p>{% endif %}
+    {% if error %}<p>{{ error }}</p>{% endif %}
     {% if data %}
-    <h2>Результат обработки</h2>
-    <table>
-        <tr><th>Исходное</th><th>Повёрнутое</th></tr>
-        <tr><td><img src="{{ data.original }}"></td><td><img src="{{ data.rotated }}"></td></tr>
-    </table>
-    <h2>Графики RGB</h2>
-    <table>
-        <tr><th>До поворота</th><th>После поворота</th></tr>
-        <tr><td><img src="{{ data.graph1 }}"></td><td><img src="{{ data.graph2 }}"></td></tr>
-    </table>
+        <p>До поворота</p><img src="/static/original.png">
+        <p>После поворота</p><img src="/static/rotated.png">
+        <p>RGB до</p><img src="/static/graph1.png">
+        <p>RGB после</p><img src="/static/graph2.png">
     {% endif %}
 </body>
 </html>

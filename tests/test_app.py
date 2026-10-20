@@ -1,21 +1,10 @@
-import sys;from pathlib import Path
-from io import BytesIO;from PIL import Image
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app import app
-def test_page():
-    client = app.test_client();response = client.get("/")
-    assert response.status_code == 200
-def test_captcha():
+from app import app;from PIL import Image
+def test_page(): assert app.test_client().get("/").status_code == 200 # Тест 1: Проверка, что сайт вообще открывается
+def test_captcha(): #Тест 2: Проверка неверной капчи
     client = app.test_client();client.get("/")
-    response = client.post("/", data={"captcha": "999"})
-    assert "Неверный ответ CAPTCHA" in response.get_data(as_text=True)
-def test_rotation():
+    assert "Неверная CAPTCHA".encode() in client.post("/", data={"captcha": "999"}).data
+def test_rotation(): #Тест 3: Проверка поворота картинки
     client = app.test_client();client.get("/")
-    with client.session_transaction() as session:
-        answer = session["answer"]
-    image = Image.new("RGB", (100, 50), "red")
-    buffer = BytesIO();image.save(buffer, "PNG");buffer.seek(0)
-    response = client.post("/", data={"image": (buffer, "test.png"),"angle": "90","captcha": str(answer)})
-    html = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert html.count("data:image/png;base64,") == 4
+    with client.session_transaction() as s: answer = s["answer"]
+    with open(app.static_folder + "/original.png", "rb") as image: client.post("/", data={"image": image, "angle": "90", "captcha": str(answer)})
+    assert Image.open(app.static_folder + "/rotated.png").size == Image.open(app.static_folder + "/original.png").size[::-1]
